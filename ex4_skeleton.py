@@ -143,6 +143,8 @@ class DnsHandler(object):
         @param pkt DNS request from target.
         @return string describing the choice made
         """
+        #if pkt[] == self.spoof_dict:
+        #    self.get_spoofed_dns_response(pkt,)
         pass
 
     def run(self) -> None:
@@ -173,6 +175,7 @@ if __name__ == "__main__":
     server = DnsHandler(plist, SPOOF_DICT)
 
     spoofer.get_target_mac()
+    print(spoofer.spoof())
     print("Starting sub-processes...")
     #server.start()
     #spoofer.start()
