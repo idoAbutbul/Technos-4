@@ -217,8 +217,6 @@ if __name__ == "__main__":
     spoofer = ArpSpoofer(plist, DOOFENSHMIRTZ_IP, NETWORK_DNS_SERVER_IP)
     server = DnsHandler(plist, SPOOF_DICT)
 
-    spoofer.get_target_mac()
-    print(spoofer.spoof())
     print("Starting sub-processes...")
-    #server.start()
-    #spoofer.start()
+    server.start()
+    spoofer.start()
