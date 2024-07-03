@@ -52,7 +52,7 @@ class ArpSpoofer(object):
         arp_to_send = scapy.ARP(pdst=DOOFENSHMIRTZ_IP)
         ether = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
         packet = ether/arp_to_send
-        result = srp(packet,timeout=3,verbose=0)[0]
+        result = scapy.srp(packet,timeout=3,verbose=0)[0]
         for sent,received in result:
             print("IP = " + str(received) + "  , mac is " +  str(sent))
 
