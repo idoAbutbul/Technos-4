@@ -54,7 +54,8 @@ class ArpSpoofer(object):
         packet = ether/arp_to_send
         result = scapy.srp(packet,timeout=3,verbose=0)[0]
         for sent,received in result:
-            print("IP = " + str(received) + "  , mac is " +  str(sent))
+            print(str(received))
+            print("IP = " + str(received) + "  , mac is " + str(sent))
 
     def spoof(self) -> None:
         """
